@@ -1,0 +1,47 @@
+﻿open postgresql
+test database section via dummy rows
+build / flesh out basic c# interface.
+
+App.xaml — defines the WPF application entry point and global resource dictionaries (colours, styles, fonts used everywhere)
+App.xaml.cs — code-behind for App.xaml, handles app startup, first window launch, and global exception handling
+AppDbContext.cs — EF Core's connection to PostgreSQL, registers every model as a table and configures relationships
+appsettings.json — stores non-sensitive app config like app name, feature toggles
+appsettings.Development.json — stores the PostgreSQL connection string locally, gitignored so it never gets pushed
+Views
+LoginView.xaml — the login screen UI, email/password fields and submit button
+DashboardView.xaml — main landing screen after login, summary widgets for attendance, plots, snags
+AttendanceView.xaml — timesheet display, sign in/out controls, manager approval actions
+PlotView.xaml — plot selector, document/blueprint viewer, snag list per plot
+SnagView.xaml — full snag list, status filters, confirm/reject actions for manager
+PlantView.xaml — equipment log, add/edit plant entries, lease info display
+
+ViewModels
+LoginViewModel.cs — handles login form input, calls AuthService, stores the logged-in user session
+DashboardViewModel.cs — fetches and shapes summary data to populate the dashboard widgets
+AttendanceViewModel.cs — loads timesheet records, handles approval button logic, triggers export
+PlotViewModel.cs — manages plot selection state, loads documents and snags for the selected plot
+SnagViewModel.cs — loads snag list, handles status transitions, wires confirm/reject to SnagService
+PlantViewModel.cs — loads equipment records, handles add/edit form state for plant entries
+
+Repositories
+IUserRepository.cs — interface defining what user DB operations are available (get, create, update)
+UserRepository.cs — implements IUserRepository, contains the actual EF Core queries against the users table
+IAttendanceRepository.cs — interface for attendance DB operations (get by user, get by date, update sign out)
+AttendanceRepository.cs — implements attendance queries, handles the sign in/out row logic
+ISnagRepository.cs — interface for snag operations (get by plot, update status, get pending)
+SnagRepository.cs — implements snag queries, filters by status, handles confirmed_by update
+
+Services
+AuthService.cs — verifies login credentials, hashes passwords with BCrypt, holds the current user session in memory
+AttendanceService.cs — autofill timesheet logic, approval workflow, Sage/Xero export formatting
+SnagService.cs — manages snag state machine (open → done → confirmed), triggers any notifications
+FileImportService.cs — handles drag-and-drop files, reads PDFs and images, stores them against the right plot or user record
+
+SQL
+schema.sql — full PostgreSQL schema, all CREATE TABLE statements with FK constraints
+seeds.sql — dummy data for development, test users, placeholder plots and snags
+
+ConstructionApp.Shared
+/Models — C# model classes shared across the project, avoids duplicating them if you expand later
+/Interfaces — shared interface definitions, useful if services ever need to be swapped out
+/DTOs — Data Transfer Objects, shaped specifically for exports (Sage, Xero) or future API use

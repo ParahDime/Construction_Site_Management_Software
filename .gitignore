@@ -38,3 +38,5 @@ logs/
 # Test results
 TestResults/
 coverage/
+
+appsettings.Development.json
