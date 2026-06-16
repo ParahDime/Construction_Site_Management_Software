@@ -1,0 +1,2 @@
+﻿.xaml file - used as a way to display what's on the screen
+.xaml.css - shows it belongs, also has logic
