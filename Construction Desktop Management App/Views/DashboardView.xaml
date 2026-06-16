@@ -1,12 +1,55 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Construction_Desktop_Management_App.Views
+﻿using System.Windows;
+using ConstructionApp.Desktop.ViewModels;
+ 
+namespace ConstructionApp.Desktop.Views
 {
-class DashboardView
-{
-}
+    // Code-behind for DashboardView.xaml
+    // Keep this as thin as possible — logic belongs in the ViewModel, not here
+    public partial class DashboardView : Window
+    {
+        // Constructor — called when the window is created
+        public DashboardView()
+        {
+            InitializeComponent(); // Wires up the XAML — always required, always first
+        }
+ 
+        // ---------------------------------------------------------------
+        // Only put code here if it genuinely cannot live in the ViewModel
+        // Examples of things that belong here:
+        //   - Drag and drop events (WPF drag events need direct UI references)
+        //   - Window lifecycle events (Loaded, Closing, SizeChanged)
+        //   - Anything that needs direct access to a named XAML element
+        //
+        // Examples of things that do NOT belong here:
+        //   - Calling services or repositories
+        //   - Any business logic
+        //   - Loading or transforming data
+        // ---------------------------------------------------------------
+ 
+        // Example: refresh dashboard data when the window finishes loading
+        // The ViewModel exposes a LoadCommand that the view triggers here
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            // Cast DataContext to the known ViewModel type and invoke load
+            if (DataContext is DashboardViewModel vm)
+            {
+                vm.LoadCommand.Execute(null); // triggers LoadDashboardData() on the VM
+            }
+        }
+ 
+        // Example: handle drag-and-drop of files onto the window
+        // FileImportService lives on the ViewModel — view just passes the file paths
+        private void Window_Drop(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+ 
+                if (DataContext is DashboardViewModel vm)
+                {
+                    vm.HandleDroppedFilesCommand.Execute(files); // VM decides what to do with them
+                }
+            }
+        }
+    }
 }

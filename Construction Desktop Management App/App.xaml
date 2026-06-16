@@ -1,12 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿ public partial class App : Application
+{
+    // 1. STARTUP (load first window and display)
+    protected override void OnStartup(StartupEventArgs e)
+    {
+        // Get the login window from the DI container and show it
+        // Program.cs built the container — App.xaml.cs consumes it
+        var loginWindow = ServiceLocator.Get<LoginView>();
+        loginWindow.Show();
+    }
 
-namespace Construction_Desktop_Management_App
-{
-class App
-{
-}
+    // 2. SHUTDOWN
+    protected override void OnExit(ExitEventArgs e)
+    {
+        // save any states
+        // e.g. flush any pending audit log writes, dispose the DB context
+    }
+
+    // 3. UNHANDLED EXCEPTIONS
+    // Last-chance handler — catches anything not caught elsewhere
+    // Stops the app from silently crashing with no feedback
+    private void App_DispatcherUnhandledException(object sender,
+        DispatcherUnhandledExceptionEventArgs e)
+    {
+        // Log the exception, show a user-friendly message
+        // Set e.Handled = true to prevent the app from force-closing
+        MessageBox.Show($"Something went wrong: {e.Exception.Message}");
+        e.Handled = true;
+    }
 }
